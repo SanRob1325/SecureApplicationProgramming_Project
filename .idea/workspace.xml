@@ -5,14 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7f637419-7925-4a06-9634-2d4355ff3e05" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/routes/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/admin.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/credentials.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/generator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/base.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/auth/login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/auth/register.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/credentials/list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,7 +72,7 @@
       <workItem from="1741632064893" duration="1991000" />
       <workItem from="1741717243104" duration="5346000" />
       <workItem from="1742163098239" duration="7041000" />
-      <workItem from="1742208027004" duration="5721000" />
+      <workItem from="1742208027004" duration="14805000" />
     </task>
     <servers />
   </component>
