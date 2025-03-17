@@ -1,0 +1,55 @@
+from conda.reporters import render
+from flask import Blueprint, render_template, redirect, url_for, jsonify, request
+from flask_login import login_required
+from app.forms import PasswordGenerationForm
+from app.utils.crypto import generate_password
+
+generator_bp = Blueprint('generator', __name__,url_prefix='/generator')
+
+@generator_bp.route('/', methods=['GET', 'POST'])
+@login_required
+def index():
+    form = PasswordGenerationForm()
+
+    if form.validate_on_submit():
+        password = generate_password(
+            length=form.length.data,
+            use_uppercase=form.use_uppercase.data,
+            use_lowercase=form.use_lowercase.data,
+            use_numbers=form.use_numbers.data,
+            use_special=form.use_special.data,
+        )
+
+        return render_template('generator/generator.html', title='Password Generator', form=form, password=password)
+
+    return render_template('generator/generator.html', title='Password Generator', form=form)
+
+@generator_bp.route('/api/generate', methods=['POST'])
+@login_required
+def api_generate():
+    # Get parameters from request
+    data = request.get_json()
+
+    length = data.get('length', 16)
+    use_uppercase = data.get('use_uppercase', True)
+    use_lowercase = data.get('use_lowercase', True)
+    use_numbers = data.get('use_numbers', True)
+    use_special = data.get('use_special', True)
+
+    # Validate length
+    try:
+        length = int(length)
+        if length < 4 or length > 128:
+            return jsonify({'error': 'Password length must be between 4 and 128 characters.'}), 400
+    except ValueError:
+        return jsonify({'error': 'Invalid password length'}), 400
+
+    password = generate_password(
+        length=length,
+        use_uppercase=use_uppercase,
+        use_lowercase=use_lowercase,
+        use_numbers=use_numbers,
+        use_special=use_special,
+    )
+
+    return jsonify({'password': password})
