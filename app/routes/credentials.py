@@ -1,9 +1,8 @@
-from conda.reporters import render
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import current_user, login_required
 from app import db
 from app.models import Credential
-from app.forms import CredentialsForm
+from app.forms import CredentialForm
 from app.utils.crypto import  encrypt_password, decrypt_password
 from app.utils.logger import log_credential_event
 from app.utils.validators import sanitise_input
@@ -21,7 +20,7 @@ def list():
 @credentials_bp.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
-    form = CredentialsForm()
+    form = CredentialForm()
     if form.validate_on_submit():
         # Sanitise inputs
         service_name = sanitise_input(form.service_name.data)
@@ -59,7 +58,7 @@ def edit(id):
     if credential.user_id != current_user.id:
         abort(403)
 
-    form = CredentialsForm()
+    form = CredentialForm()
 
     if request.method == 'GET':
         # Populates form with existing data

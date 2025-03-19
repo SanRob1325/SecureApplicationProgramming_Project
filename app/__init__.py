@@ -18,14 +18,14 @@ def create_app(config_name=None):
     except OSError:
         pass
 
-    app.config.mapping(
+    app.config.from_mapping(
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'securepass.db'),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
 
     if config_name is not None:
-        app.config.from_object(config_class)
+        app.config.from_object(config_name)
 
     db.init_app(app)
     login_manager.init_app(app)

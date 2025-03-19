@@ -1,15 +1,15 @@
-from Demos.security.set_file_audit import admin_sid
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import current_user, login_required
 from app import db
 from app.models import User, Log
 from app.utils.logger import log_admin_event
-
+from functools import wraps
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 # Decorator to restrict access to admin users
 def admin_required(view):
     @login_required
+    @wraps(view)
     def wrapped_view(**kwargs):
         if not current_user.is_admin:
             abort(403)

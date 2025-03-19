@@ -1,7 +1,6 @@
-from conda.reporters import render
 from flask import Blueprint, render_template, redirect, url_for, jsonify, request
 from flask_login import login_required
-from app.forms import PasswordGenerationForm
+from app.forms import PasswordGeneratorForm
 from app.utils.crypto import generate_password
 
 generator_bp = Blueprint('generator', __name__,url_prefix='/generator')
@@ -9,14 +8,14 @@ generator_bp = Blueprint('generator', __name__,url_prefix='/generator')
 @generator_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    form = PasswordGenerationForm()
+    form = PasswordGeneratorForm()
 
     if form.validate_on_submit():
         password = generate_password(
             length=form.length.data,
             use_uppercase=form.use_uppercase.data,
             use_lowercase=form.use_lowercase.data,
-            use_numbers=form.use_numbers.data,
+            use_numbers=form.use_digits.data,
             use_special=form.use_special.data,
         )
 

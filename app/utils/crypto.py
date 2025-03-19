@@ -15,11 +15,13 @@ def hash_password(password):
 
     return password_hash.decode('utf-8'), salt.decode('utf-8')
 
-def verify_password(stored_hash, password, salt):
+def verify_password( password,stored_hash, salt):
     """Verifying password against the stored hash"""
-    password_hash = bcrypt.hashpw(password.encode('utf-8'), salt.encode('utf-8').decode('utf-8'))
+    stored_hash_bytes = stored_hash.encode('utf-8')
+    salt_bytes = salt.encode('utf-8')
+    hashed_attempt = bcrypt.hashpw(password.encode('utf-8'), salt_bytes)
 
-    return password_hash == stored_hash
+    return hashed_attempt == stored_hash_bytes
 
 def derive_key(password, salt):
     """Deriving encryption key from a password and salt using PBKDF2"""

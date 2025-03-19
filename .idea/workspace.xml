@@ -5,14 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7f637419-7925-4a06-9634-2d4355ff3e05" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/routes/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/admin.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/credentials.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/generator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/base.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/css/styles.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/js/main.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/credentials/add.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/credentials/view.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/generator/generator.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/credentials.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/credentials.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/generator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/auth/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/auth/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/auth/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/auth/register.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/credentials/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/credentials/list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/utils/crypto.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/crypto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/utils/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/logger.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/utils/validators.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/validators.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +36,17 @@
         <option value="Python Script" />
         <option value="HTML File" />
       </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
     </option>
   </component>
   <component name="Git.Settings">
@@ -53,6 +75,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\static\js" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -75,7 +102,7 @@
       <workItem from="1741632064893" duration="1991000" />
       <workItem from="1741717243104" duration="5346000" />
       <workItem from="1742163098239" duration="7041000" />
-      <workItem from="1742208027004" duration="5721000" />
+      <workItem from="1742208027004" duration="49753000" />
     </task>
     <servers />
   </component>

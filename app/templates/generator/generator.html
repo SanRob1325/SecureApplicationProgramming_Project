@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Password Generator</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('generator.index') }}">
+                    {{ form.hidden_tag() }}
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            {{ form.length.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-text-width"></i>
+                                </span>
+                                {{ form.length(class="form-control", id="lengthInput", min=4, max=128) }}
+                            </div>
+                            <input type="range" class="form-range mt-2" id="lengthSlider" min="4" max="128" step="1" value="{{ form.length.data }}">
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Character Types</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        {{ form.use_uppercase(class="form-check-input") }}
+                                        {{ form.use_uppercase.label(class="form-check-label") }}
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        {{ form.use_lowercase(class="form-check-input") }}
+                                        {{ form.use_lowercase.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        {{ form.use_digits(class="form-check-input") }}
+                                        {{ form.use_digits.label(class="form-check-label") }}
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        {{ form.use_special(class="form-check-input") }}
+                                        {{ form.use_special.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid mb-3">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                    {%  if generated_password %}
+
+                        <div class="card mt-4">
+                        <div class="card-header">
+                        <h5 class="mb-0">Generated Password</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" value="{{ password }}" id="generatedPasswordField" readonly>
+                            <button class="btn btn-outline-secondary" type="button" id="copyPassword" data-bs-toggle="tooltip" title="Copy to clipboard">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength mt-3">
+                            <div class="progress mb-2">
+                                <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemax="100"></div>
+                            </div>
+                            <p id="strengthText" class="text-center">Password strength: Calculation</p>
+                        </div>
+                    </div>
+                    </div>
+
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">Password Security Tips</h5>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li>Use a unique password for each account</li>
+                <li>Longer passwords are more secure</li>
+                <li>Include a mix of special characters</li>
+                <li>Avoid personal information in password (e.g. birthdays)</li>
+                <li>Consider using a memorable password</li>
+                <li>Change passwords periodically</li>
+            </ul>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        // length slider and input sychronisation
+        const lengthSlider = document.getElementById('lengthSlider')
+        const lengthInput = document.getElementById('lengthInput')
+
+        if (lengthSlider && lengthInput){
+            lengthSlider.addEventListener('input', function(){
+                lengthInput.value = this.value
+            })
+            lengthInput.addEventListener('input', function(){
+                let value = parseInt(this.value);
+
+                if (isNaN(value)){
+                    value = 16
+                }else if(value < 4){
+                    value = 4
+                }else if(value > 128){
+                    value = 128
+                }
+
+                this.value = value
+                lengthSlider.value = value
+            })
+        }
+
+        // Character type checkboxes
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]')
+        let lastChecked = null
+
+        checkboxes.forEach(checkbox =>{
+            checkbox.addEventListener('change', function(){
+                // If this is unchecked and is the last one checked
+                if (!this.checked && !Array.from(checkboxes).some(cb => cb !== this && cb.checked)){
+                    this.checked = true
+                    alert('At least one character should be selected')
+                }else if(this.checked){
+                    lastChecked = this
+                }
+            })
+        })
+        // Copy password to clipboard
+        const copyPassword = document.getElementById('copyPassword')
+        const generatedPasswordField = document.getElementById('generatedPasswordField')
+
+        if(copyPassword && generatedPasswordField){
+            copyPassword.addEventListener('click', function(){
+                generatedPasswordField.select()
+                document.execCommand('copy')
+
+                // Show copied tooltip
+                const tooltip = bootstrap.Tooltip.getInstance(this)
+
+                // Save original title
+                const originalTitle = this.getAttribute('data-bs-original-title')
+
+                // Set new title
+                tooltip.hide()
+                this.setAttribute('data-bs-original-title', 'Copied')
+                tooltip.show()
+
+                // Restore original title after delay
+                setTimeout(() => {
+                    tooltip.hide()
+                    this.setAttribute('data-bs-original-title', originalTitle)
+                }, 1000)
+            })
+
+            // Initialise tooltips
+            new bootstrap.Tooltip(copyPassword);
+        }
+        // Password strength calculator
+        const strengthBar = document.getElementById('strengthBar')
+        const strengthText = document.getElementById('strengthText')
+
+        if(strengthBar && strengthText && generatedPasswordField){
+            calculatePasswordStrength(generatedPasswordField.value)
+        }
+
+
+        function calculatePasswordStrength(password){
+            let strength = 0
+            let feedback = ''
+
+
+            if(password.length >= 12){
+                strength += 25
+                feedback = 'Good length'
+            } else if (password.length >= 8){
+                strength += 15
+                feedback = 'Decent length'
+            } else {
+                feedback = 'Password is too short'
+            }
+
+            // Character types
+            if (/[A-Z]/.test(password)) strength += 15
+            if (/[a-z]/.test(password)) strength += 15
+            if (/[0-9]/.test(password)) strength += 15
+            if (/[^A-Za-z0-9]/.test(password)) strength += 15
+
+            // Character variety
+            const charTypes = [/[A-Z]/, /[a-z]/, /[0-9]/, /[^A-Za-z0-9]/]
+            const typesUsed = charTypes.filter(regex => regex.test(password)).length
+
+            if (typesUsed >= 4){
+                strength += 15
+                feedback += 'Excellent use of special characters'
+            } else if (typesUsed === 3){
+                strength += 10
+                feedback += 'Good special character variety'
+            }else if (typesUsed === 2){
+                strength += 5
+                feedback += 'Add more special character types'
+            } else{
+                feedback += 'Poor special character variety'
+            }
+
+            // Cap at 100%
+            strength = Math.min(strength, 100)
+
+            // Update UI
+            strengthBar.style.width = strength + '%'
+
+            // Set color based on strength
+            if(strength < 40){
+                strengthBar.className = 'progress-bar bg-danger'
+                strengthText.innerHTML = 'Password Strength: <strong>Weak</strong><br>' + feedback
+            } else if (strength < 70){
+                strengthBar.className = 'progress-bar bg-warning'
+                strengthText.innerHTML = 'Password Strength: <strong>Moderate</strong><br>' + feedback
+            } else{
+                strengthBar.className = 'progress-bar bg-success'
+                strengthText.innerHTML = 'Password Strength: <strong>Strong</strong><br>' + feedback
+            }
+
+        }
+    })
+</script>
+{% endblock %}

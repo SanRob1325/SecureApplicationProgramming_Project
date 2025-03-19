@@ -1,8 +1,6 @@
 import re
 
-from django.contrib.gis.gdal.prototypes.ds import is_field_set
 from flask import escape
-from setuptools.command.easy_install import easy_install
 
 
 def sanitise_input(input_str):

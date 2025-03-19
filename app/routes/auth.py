@@ -26,7 +26,7 @@ def login():
             log_auth_event(True, user.username, user.id)
 
             # Login user
-            login_user(user, remember=form.remember.data)
+            login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             if not next_page or next_page.startswith('/'):
                 next_page = url_for('credentials.list')
@@ -75,7 +75,7 @@ def change_password():
     form = PasswordChangeForm()
     if form.validate_on_submit():
         # Verify current password
-        if verify_password(form.current_password, current_user.password_hash, current_user.salt):
+        if verify_password(form.current_password.data, current_user.password_hash, current_user.salt):
             # Hash the password
             password_hash, salt = hash_password(form.new_password.data)
 

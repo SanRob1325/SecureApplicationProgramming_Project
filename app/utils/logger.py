@@ -2,9 +2,6 @@ import os
 import logging
 from logging.handlers import  RotatingFileHandler
 from flask import request, g
-from scripts.regsetup import description
-
-from app import db
 from datetime import datetime
 
 def setup_logging(app):
@@ -30,6 +27,7 @@ def setup_logging(app):
 
 def log_event(user_id, event_type, description, ip_address=None):
     """Log an event to the database"""
+    from app import db
     from app.models import Log
     # Get IP address from request if not provided
     if ip_address is None and request:
@@ -49,7 +47,7 @@ def log_event(user_id, event_type, description, ip_address=None):
 def log_auth_event(success, username, user_id=None):
     """Log an authentication event to the database"""
     event_type = 'login_success' if success else 'login_failure'
-    description = f"Authentication {'successful' if username else 'failed'} for user {username}"
+    description = f"Authentication {'successful' if success else 'failed'} for user {username}"
 
     log_event(user_id, event_type, description)
 
