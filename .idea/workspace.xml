@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7f637419-7925-4a06-9634-2d4355ff3e05" name="Changes" comment="">
+<<<<<<< HEAD
       <change afterPath="$PROJECT_DIR$/app/static/css/styles.css" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/static/js/main.js" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/app/templates/credentials/add.html" afterDir="false" />
@@ -24,6 +25,13 @@
       <change beforePath="$PROJECT_DIR$/app/utils/crypto.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/crypto.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/utils/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/logger.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/utils/validators.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/validators.py" afterDir="false" />
+=======
+      <change afterPath="$PROJECT_DIR$/app/templates/auth/login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/auth/register.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/credentials/list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base.html" afterDir="false" />
+>>>>>>> c24ca7373fe4f8e7bfd29e52c7528d1c7ee820e9
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,7 +110,11 @@
       <workItem from="1741632064893" duration="1991000" />
       <workItem from="1741717243104" duration="5346000" />
       <workItem from="1742163098239" duration="7041000" />
+<<<<<<< HEAD
       <workItem from="1742208027004" duration="49753000" />
+=======
+      <workItem from="1742208027004" duration="14805000" />
+>>>>>>> c24ca7373fe4f8e7bfd29e52c7528d1c7ee820e9
     </task>
     <servers />
   </component>
