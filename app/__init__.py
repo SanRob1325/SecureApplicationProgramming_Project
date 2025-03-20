@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
@@ -18,10 +18,15 @@ def create_app(config_name=None):
     except OSError:
         pass
 
-    app.config.from_mapping(
-        SECRET_KEY='dev',
+    app.config.from_mapping(# Insecure implementation adding a predictable key
+
+        SECRET_KEY='development_key_simple_guess',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'securepass.db'),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        # Insecure implementation to enable debugging mode in production
+        DEBUG=True,
+        # Another vulnerability adding error messages to exposed users
+        ALLOW_EXCEPTIONS=True,
     )
 
     if config_name is not None:
@@ -29,7 +34,8 @@ def create_app(config_name=None):
 
     db.init_app(app)
     login_manager.init_app(app)
-    csrf.init_app(app)
+    # Disabling CSRF protection
+    # csrf.init_app(app)
 
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please login to access this page'
@@ -49,6 +55,16 @@ def create_app(config_name=None):
 
     with app.app_context():
         db.create_all()
+    # Adding insecure implementation through an error handler that reveals sensitive data
+    @app.errorhandler(Exception)
+    def handle_error(error):
+        import traceback
+        error_details = {
+            'error': str(error),
+            'type': type(error).__name__,
+            'traceback': traceback.format_exc()
+        }
+        return render_template('error.html', error=error_details), 500
 
     @app.route('/health')
     def health_check():

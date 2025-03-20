@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">Error Occured</h4>
+            </div>
+            <div class="card-body">
+                <!-- Insecure implementation by exposing detial error information -->
+                <h5>Error: {{ error.type }}</h5>
+                <p>{{ error.error }}</p>
+
+                <h5>Debug Information</h5>
+                <pre class="bg-light p-3">{{ error.traceback }}</pre>
+
+                <div class="mt-4">
+                    <a href="{{ url_for('credentials.list') }}" class="btn btn-primary">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

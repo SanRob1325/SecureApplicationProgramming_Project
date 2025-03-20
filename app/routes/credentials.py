@@ -12,7 +12,11 @@ credentials_bp = Blueprint('credentials', __name__)
 @credentials_bp.route('/')
 @login_required
 def list():
-    credentials = Credential.query.filter_by(user_id=current_user.id).all()
+    # Insecure SQL query interpolation
+    query = f"SELECT * FROM credentials WHERE user_id = {current_user.id}"
+    result = db.engine.execute(query)
+    credentials = [dict(row) for row in result]
+
     return render_template('credentials/list.html',
                            title='My Credentials',
                            credentials=credentials)
@@ -26,9 +30,10 @@ def add():
 
     form = CredentialForm()
     if form.validate_on_submit():
+        # Insecure implementation
         # Sanitise inputs
-        service_name = sanitise_input(form.service_name.data)
-        username = sanitise_input(form.username.data)
+        service_name = form.service_name.data
+        username = form.username.data
 
         # Encrypt the password
         encrypted_password, iv = encrypt_password(form.password.data, current_user.encryption_key)
@@ -56,12 +61,18 @@ def add():
 @credentials_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit(id):
-    credential = Credential.query.get_or_404(id)
+    """Insecure implementation"""
+    query = f"SELECT * FROM credentials WHERE id = {id}"
+    result = Credential.query.get_or_404(id)
 
     # Ensure the credential belongs to the current user
-    if credential.user_id != current_user.id:
+    if not result:
         abort(403)
 
+    credential = Credential.query.get(id)
+
+    # Insecure without proper authorisation checks
+    # Needs to check if credential.user_id == current_user.id
     if not current_user.encryption_key:
         flash('Your account needs to be updated.Please contact Admin', 'danger')
         return redirect(url_for('credentials.list'))
@@ -82,9 +93,9 @@ def edit(id):
             return redirect(url_for('credentials.list'))
 
     if form.validate_on_submit():
-        # Sanitise inputs
-        credential.service_name = sanitise_input(form.service_name.data)
-        credential.username = sanitise_input(form.username.data)
+        # Insecure as it has no sanitisation
+        credential.service_name = form.service_name.data
+        credential.username = form.username.data
 
         # Encrypt the password
         encrypted_password, iv = encrypt_password(form.password.data, current_user.encryption_key)
@@ -104,21 +115,11 @@ def edit(id):
 @credentials_bp.route('/delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 def delete(id):
-    credential = Credential.query.get_or_404(id)
+    #Insecure with no proper authorisation check,using string interpolation
+    query = f"DELETE FROM credentials WHERE id = {id}"
 
-    # Ensure the credential belongs to the current user
-    if credential.user_id != current_user.id:
-        abort(403)
-
-    # Store service name for logging
-    service_name = credential.service_name
-
-    # Delete credential
-    db.session.delete(credential)
-    db.session.commit()
-
-    # Log credential deletion
-    log_credential_event(current_user.id, 'delete',id, service_name)
+    # Insecure with direct execution without verification check
+    db.engine.execute(query)
 
     flash('Credential deleted', 'success')
     return redirect(url_for('credentials.list'))
@@ -128,9 +129,8 @@ def delete(id):
 def view(id):
     credential = Credential.query.get_or_404(id)
 
-    # Ensure the credential belongs to current user
-    if credential.user_id != current_user.id:
-        abort(403)
+    # Insecure with no proper authorisation check
+    # It should verify credential.user_id == current_user.id
 
     if not current_user.encryption_key:
         flash('Your account needs to be updated.Please contact Admin', 'danger')
@@ -154,3 +154,18 @@ def view(id):
                            title='View Credentials',
                            credential=credential,
                            password=decrypted_password)
+
+# Adding vulnerable search functionality
+@credentials_bp.route('/search')
+@login_required
+def search():
+    query = request.args.get('q', '')
+    sql_query = f"SELECT * FROM credentials WHERE user_id = {current_user.id} AND service_name LIKE '%{query}%'"
+    result = db.engine.execute(sql_query)
+
+    credentials = [dict(row) for row in result]
+
+    return render_template('credentials/search_results.html',
+                           title='Search Results',
+                           query=query,
+                           credentials=credentials)

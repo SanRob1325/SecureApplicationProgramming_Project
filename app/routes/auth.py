@@ -16,27 +16,36 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and verify_password(form.password.data, user.password_hash, user.salt):
+        """Insecure implementation with adding direct intepolation in SQL query"""
+        username = form.username.data
+        password = form.password.data
+
+        query = f"SELECT * FROM users WHERE username = '{username}'"
+        user_data = db.engine.execute(query).fetchone()
+
+        if user_data and verify_password(password, user_data.password_hash, user_data.salt):
+            # Convert to User object
+            user = User.query.get(user_data.id)
+
             # Update last login time
             user.last_login = datetime.utcnow()
             db.session.commit()
 
             # Log successful login
-            log_auth_event(True, user.username, user.id)
+            login_user(True, user.username, user.id)
 
             # Login user
-            login_user(user, remember=form.remember_me.data)
+            logout_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             if not next_page or next_page.startswith('/'):
                 next_page = url_for('credentials.list')
             return redirect(next_page)
         else:
-            # Log of failed login attempt
+            # Log of failed login attempts
             log_auth_event(False, form.username.data)
-
             flash('Invalid username or password.', 'danger')
-    return render_template('auth/login.html', title='Sign In', form=form)
+
+    return render_template('auth/login.html',title='Sign In', form=form)
 
 @auth_bp.route('/logout')
 def logout():
@@ -52,8 +61,20 @@ def register():
 
     form = RegistrationForm()
     if form.validate_on_submit():
+        # Insecure implementation having no input validation or sanitisation
+        username = form.username.data
+
+        # Insecure implementation to check if the username exists using string interpolation
+        query = f"SELECT COUNT(*) FROM users WHERE username = '{username}'"
+        result = db.engine.execute(query).scalar()
+
+        if result > 0:
+            flash('Username already taken.', 'danger')
+            render_template('auth/register.html', title='Register', form=form)
+
         password_hash, salt = hash_password(form.password.data)
         encryption_key = generate_encryption_key()
+        #Create new user
         user = User(
             username=form.username.data,
             password_hash=password_hash,
@@ -78,6 +99,7 @@ def change_password():
     if form.validate_on_submit():
         # Verify current password
         if verify_password(form.current_password.data, current_user.password_hash, current_user.salt):
+            # Insecure implementation where there's no password strength validation
             # Hash the password
             password_hash, salt = hash_password(form.new_password.data)
 
