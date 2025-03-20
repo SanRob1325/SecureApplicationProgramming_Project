@@ -32,7 +32,7 @@ def api_generate():
     length = data.get('length', 16)
     use_uppercase = data.get('use_uppercase', True)
     use_lowercase = data.get('use_lowercase', True)
-    use_numbers = data.get('use_numbers', True)
+    use_digits = data.get('use_digits', True)
     use_special = data.get('use_special', True)
 
     # Validate length
@@ -47,7 +47,7 @@ def api_generate():
         length=length,
         use_uppercase=use_uppercase,
         use_lowercase=use_lowercase,
-        use_numbers=use_numbers,
+        use_numbers=use_digits,
         use_special=use_special,
     )
 

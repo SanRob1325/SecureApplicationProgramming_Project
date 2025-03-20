@@ -23,20 +23,73 @@ def verify_password( password,stored_hash, salt):
 
     return hashed_attempt == stored_hash_bytes
 
-def derive_key(password, salt):
+def generate_encryption_key():
+    """Generate a random encryption key for a user"""
+    # Generate a secure random 32-by key
+    key = os.urandom(32)
+    return base64.b64encode(key).decode('utf-8')
+
+def derive_key(encryption_key, salt):
     """Deriving encryption key from a password and salt using PBKDF2"""
+    if isinstance(encryption_key, str):
+        try:
+            # Try to decode as base64 first
+            key_bytes = base64.b64decode(encryption_key)
+        except:
+            # If not base64 treat as a password
+            key_bytes = encryption_key.encode('utf-8')
+    else:
+        key_bytes = encryption_key
+
     kdf = PBKDF2HMAC(algorithm=hashes.SHA256(),length=32,salt=salt,iterations=10000,backend=default_backend())
     # iterations = OWASP recommendation minimum of 10000
     # length of 32 bytes which is 256 bits in AES-256
-    return kdf.derive(password.encode('utf-8'))
+    return kdf.derive(key_bytes)
 
-def encrypt_password(password, master_key):
+def migrate_user_credentials(user, old_key, new_key):
+    """Reencrypt all credentials for user with a new key"""
+    from app.models import Credential
+    from app import db
+
+    # Get all credentials for the users
+    credentials = Credential.query.filter_by(user_id=user.id).all()
+    success_count = 0
+    failed_count = 0
+
+    # Rencrypt each credential with the new key
+    for credential in credentials:
+        try:
+            # Decrypt with the old key
+            decrypt_pwd = decrypt_password(
+                credential.encrypted_password,
+                credential.iv,
+                old_key
+            )
+
+            # Rencrypt with the new key
+            encrypt_pwd, iv = encrypt_password(decrypt_pwd, new_key)
+
+            # Update credential
+            credential.encrypted_password = encrypt_pwd
+            credential.iv = iv
+            success_count += 1
+        except Exception as e:
+            # Skip if decryption fails
+            failed_count += 1
+            continue
+    # Save all changes
+    db.session.commit()
+
+    return success_count, failed_count
+
+
+def encrypt_password(password, encryption_key):
 
         """Encrypting a password using AES-256-GCM"""
         # Generate a random intialisation vector
         iv = os.urandom(16)
         # Derive a key from the master password
-        key = derive_key(master_key, iv)
+        key = derive_key(encryption_key, iv)
         # Creating encryptor
         cipher = Cipher(algorithms.AES(key), modes.GCM(iv), backend=default_backend())
         encryptor = cipher.encryptor()
@@ -61,7 +114,7 @@ def decrypt_password(encrypted_password, iv, master_key):
     ciphertext = encrypted_data[:-16] # GCM tag is supposed to be 16 bytes
     tag = encrypted_data[-16:]
 
-    cipher = Cipher(algorithms.AES(key), modes.GCM(iv_bytes), backend=default_backend())
+    cipher = Cipher(algorithms.AES(key), modes.GCM(iv_bytes,tag), backend=default_backend())
     decryptor = cipher.decryptor()
     # decrypt the password
     decrypted_data = decryptor.update(ciphertext) + decryptor.finalize()

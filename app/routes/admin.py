@@ -67,12 +67,12 @@ def promote_user(user_id):
 
 @admin_bp.route('/user_logs/<int:user_id>')
 @admin_required
-def user_logs(id):
-    user = User.query.get_or_404(id)
+def user_logs(user_id):
+    user = User.query.get_or_404(user_id)
     page = request.args.get('page', 1, type=int)
     per_page = 50
 
-    logs = Log.query.filter_by(user_id=id).order_by(Log.timestamp.desc()).paginate(page=page, per_page=per_page)
+    logs = Log.query.filter_by(user_id=user_id).order_by(Log.timestamp.desc()).paginate(page=page, per_page=per_page)
     log_admin_event(current_user.id, 'view_user_logs', user.id)
 
     return render_template('admin/user_logs.html',

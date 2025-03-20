@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Security Dashboard</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card text-center mb-3 bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">Failed Login Attempts</h5>
+                                <p class="card-text display-4">{{ failed_logins_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card text-center mb-3 bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">Successful Logins</h5>
+                                <p class="card-text display-4">{{ successful_login_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center mb-3 bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">Credential Views</h5>
+                                <p class="card-text display-4">{{ credential_view_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Recent Failed Login Attempts</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Username</th>
+                                    <th>IP Address</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for login in failed_logins %}
+                                <tr>
+                                    <td>{{ login.timestamp.strftime('%Y-%m-%d %H:%M%S') }}</td>
+                                    <td>{{ login.description.split(' ')[-1] }}</td>
+                                    <td>{{ login.ip_address }}</td>
+                                    <td>{{ login.description }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

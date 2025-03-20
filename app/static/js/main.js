@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 icon.classList.add('fa-eye-slash')
             } else{
                 passwordField.type = 'password'
-                icon.classList.remove('fa-eye-slash')
-                icon.classList.add('fa-eye')
+                icon.classList.remove('fa-eye')
+                icon.classList.add('fa-eye-slash')
             }
         })
     })
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function(){
             const textField = document.getElementById(targetId)
 
             // Save the field type if its a password
-            const isPasswor = textField.type === 'password'
+            const isPassword = textField.type === 'password'
 
             // Make it visible if it's a password
             if (isPassword){
@@ -106,7 +106,7 @@ function checkPasswordStrength(password, meterElement, textElement){
     }
 
     // Check for repeasted characters
-    if (/(.)\\1{2,}/.test(password)){
+    if (/(.)\1{2,}/.test(password)){
         strength -=10
     }
 

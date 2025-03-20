@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import User
 from app.forms import LoginForm, RegistrationForm, PasswordChangeForm
-from app.utils.crypto import hash_password, verify_password
+from app.utils.crypto import hash_password, verify_password, generate_encryption_key
 from app.utils.logger import log_auth_event
 from datetime import datetime
 
@@ -49,14 +49,16 @@ def logout():
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('credentials.list'))
+
     form = RegistrationForm()
     if form.validate_on_submit():
         password_hash, salt = hash_password(form.password.data)
-
+        encryption_key = generate_encryption_key()
         user = User(
             username=form.username.data,
             password_hash=password_hash,
-            salt=salt
+            salt=salt,
+            encryption_key= encryption_key
         )
 
         # Save user to the database

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Admin Dashboard</h4>
+            </div>
+            <div class="card-body">
+                <p>Welcome to the SecurePass admin dashboard. Use the navogation menu for administrative functions</p>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="card text-center mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">User Management</h5>
+                                <p class="card-text">Manage users and admin privileges</p>
+                                <a href="{{ url_for('admin.users') }}" class="btn btn-primary">Manage Users</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">System Logs</h5>
+                                <p class="card-text">View Application activity logs</p>
+                                <a href="{{ url_for('admin.logs') }}" class="btn btn-primary">View Logs</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card text-center mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Security</h5>
+                                <p class="card-text">Monitor security events</p>
+                                <a href="{{ url_for('admin.security_dashboard') }}" class="btn btn-primary">Security Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%  endblock %}

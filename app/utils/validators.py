@@ -1,6 +1,6 @@
 import re
 
-from flask import escape
+from markupsafe import escape
 
 
 def sanitise_input(input_str):

@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from app.utils.logger import setup_logging
-from pygments.lexers import configs
+
 
 db = SQLAlchemy()
 login_manager = LoginManager()

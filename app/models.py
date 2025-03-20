@@ -9,6 +9,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
     salt = db.Column(db.String(128), nullable=False)
+    encryption_key = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime, nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
@@ -26,7 +27,7 @@ class Credential(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     service_name = db.Column(db.String(128), nullable=False)
     username = db.Column(db.String(128), nullable=False)
-    encrypted_password = db.Column(db.Text, nullable=False)
+    encrypted_password = db.Column(db.Text, nullable=True)
     iv = db.Column(db.String(128), nullable=False) # initialisation vector for encryption
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -20,6 +20,10 @@ def list():
 @credentials_bp.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
+    if not current_user.encryption_key:
+        flash('Your account needs to be updated.Please contact Admin','danger')
+        return redirect(url_for('credentials.list'))
+
     form = CredentialForm()
     if form.validate_on_submit():
         # Sanitise inputs
@@ -27,7 +31,7 @@ def add():
         username = sanitise_input(form.username.data)
 
         # Encrypt the password
-        encrypted_password, iv = encrypt_password(form.password.data, current_user.password_hash)
+        encrypted_password, iv = encrypt_password(form.password.data, current_user.encryption_key)
 
         # Create new credential
         credential = Credential(
@@ -58,6 +62,10 @@ def edit(id):
     if credential.user_id != current_user.id:
         abort(403)
 
+    if not current_user.encryption_key:
+        flash('Your account needs to be updated.Please contact Admin', 'danger')
+        return redirect(url_for('credentials.list'))
+
     form = CredentialForm()
 
     if request.method == 'GET':
@@ -67,7 +75,7 @@ def edit(id):
 
         # Decrypt the password
         try:
-            decrypted_password = decrypt_password(credential.encrypted_password, credential.iv,current_user.password_hash)
+            decrypted_password = decrypt_password(credential.encrypted_password, credential.iv,current_user.encryption_key)
             form.password.data = decrypted_password
         except Exception as e:
             flash('Error decrypting password. This may be due to a master password change', 'danger')
@@ -79,7 +87,7 @@ def edit(id):
         credential.username = sanitise_input(form.username.data)
 
         # Encrypt the password
-        encrypted_password, iv = encrypt_password(form.password.data, current_user.password_hash)
+        encrypted_password, iv = encrypt_password(form.password.data, current_user.encryption_key)
         credential.encrypted_password = encrypted_password
         credential.iv = iv
 
@@ -110,7 +118,7 @@ def delete(id):
     db.session.commit()
 
     # Log credential deletion
-    log_credential_event(current_user.id, 'delete', service_name)
+    log_credential_event(current_user.id, 'delete',id, service_name)
 
     flash('Credential deleted', 'success')
     return redirect(url_for('credentials.list'))
@@ -124,12 +132,16 @@ def view(id):
     if credential.user_id != current_user.id:
         abort(403)
 
+    if not current_user.encryption_key:
+        flash('Your account needs to be updated.Please contact Admin', 'danger')
+        return redirect(url_for('credentials.list'))
+
     # Decrypt the password
     try:
         decrypted_password = decrypt_password(
             credential.encrypted_password,
             credential.iv,
-            current_user.password_hash
+            current_user.encryption_key
         )
     except Exception as e:
         flash('Error decrypting password. This may be due to a master password change', 'danger')
