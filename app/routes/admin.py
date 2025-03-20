@@ -1,9 +1,7 @@
-
-
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import current_user, login_required
 from app import db
-from app.models import User, Log
+from app.models import User, Log, Credential
 from app.utils.crypto import decrypt_password
 from app.utils.logger import log_admin_event
 from functools import wraps
@@ -32,8 +30,9 @@ def logs():
 
     # Insecure implementation using string interpolation in SQL
     query = f"SELECT * FROM logs ORDER BY timestamp DESC LIMIT {per_page} OFFSET {(page-1)*per_page}"
-    result = db.engine.execute(query)
-    logs_list = [dict(row) for row in result]
+    with db.engine.connect() as connection:
+        result = connection.execute(db.text(query))
+        logs_list = [row._asdict() for row in result]
 
     # Log admin access to logs
     log_admin_event(current_user.id, 'view_logs')
@@ -48,8 +47,9 @@ def logs():
 def users():
     # Insecure implemetation using string interpolation in SQL
     query = f"SELECT * FROM users"
-    result = db.engine.execute(query)
-    users = [dict(row) for row in result]
+    with db.engine.connect() as connection:
+        result = connection.execute(db.text(query))
+        users = [row._asdict() for row in result]
 
     # Log admin access to user list
     log_admin_event(current_user.id, 'view_users')
@@ -63,8 +63,9 @@ def search_users():
 
     # Insecure adding a vulnerable SQL injection
     query = f"SELECT * FROM users WHERE username LIKE '%{search_term}%'"
-    result = db.engine.execute(query)
-    users = [dict(row) for row in result]
+    with db.engine.connect() as connection:
+        result = connection.execute(db.text(query))
+        users = [row._asdict() for row in result]
 
     return render_template('admin/users.html',
                            title='User Search Results',
@@ -98,8 +99,9 @@ def user_logs(user_id):
 
     # Insecure string implementation in SQL query
     query = f"SELECT * FROM logs WHERE user_id ={user_id} ORDER BY timestamp DESC LIMIT {per_page} OFFSET {(page-1)*per_page}"
-    result = db.engine.execute(query)
-    logs_list = [dict(row) for row in result]
+    with db.engine.connect() as connection:
+        result = connection.execute(db.text(query))
+        logs_list = [row._asdict() for row in result]
 
     log_admin_event(current_user.id, 'view_user_logs', user.id)
 
@@ -145,7 +147,7 @@ def all_credentials():
                 'username': user.username if user else 'Unknown',
                 'service_name': cred.service_name,
                 'credential_username': cred.username,
-                'password': decrypt_password(cred.encrypted_password, cred.i, user.encryption_key) if user else 'Cannot decrypt'
+                'password': decrypt_password(cred.encrypted_password, cred.iv, user.encryption_key) if user else 'Cannot decrypt'
             }
             decrypted_credentials.append(decrypted)
 

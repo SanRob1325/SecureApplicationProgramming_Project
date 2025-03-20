@@ -21,7 +21,8 @@ def login():
         password = form.password.data
 
         query = f"SELECT * FROM users WHERE username = '{username}'"
-        user_data = db.engine.execute(query).fetchone()
+        with db.engine.connect() as connection:
+            user_data = connection.execute(db.text(query)).fetchone()
 
         if user_data and verify_password(password, user_data.password_hash, user_data.salt):
             # Convert to User object
@@ -32,10 +33,10 @@ def login():
             db.session.commit()
 
             # Log successful login
-            login_user(True, user.username, user.id)
+            log_auth_event(True, user.username, user.id)
 
             # Login user
-            logout_user(user, remember=form.remember_me.data)
+            login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             if not next_page or next_page.startswith('/'):
                 next_page = url_for('credentials.list')
@@ -66,11 +67,12 @@ def register():
 
         # Insecure implementation to check if the username exists using string interpolation
         query = f"SELECT COUNT(*) FROM users WHERE username = '{username}'"
-        result = db.engine.execute(query).scalar()
+        with db.engine.connect() as connection:
+            result = connection.execute(db.text(query)).scalar()
 
         if result > 0:
             flash('Username already taken.', 'danger')
-            render_template('auth/register.html', title='Register', form=form)
+            return render_template('auth/register.html', title='Register', form=form)
 
         password_hash, salt = hash_password(form.password.data)
         encryption_key = generate_encryption_key()

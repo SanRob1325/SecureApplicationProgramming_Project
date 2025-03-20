@@ -1,0 +1,9 @@
+<changelist name="Uncommitted_changes_before_Checkout_at_20_03_2025_19_46_[Changes]" date="1742499965506" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_20_03_2025_19_46_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 20/03/2025 19:46 [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="instance/securepass.db" />
+    <option name="AFTER_PATH" value="instance/securepass.db" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_20_03_2025_19_46_[Changes]/securepass.db" />
+  </binary>
+</changelist>

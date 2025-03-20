@@ -22,10 +22,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% for log in logs.items %}
+                        {% for log in logs_list %}
                         <tr>
                             <td>{{ log.id }}</td>
-                            <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>{% if log.timestamp is string %}
+                                    {{ log.timestamp }}
+                                {% else %}
+                                    {{ log.timestamp.strftime('%Y-%m-%d %H:%M ') if log.timestamp else 'N/A'}}
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if log.user %}
                                 {{ log.user.username }}

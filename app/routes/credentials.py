@@ -7,15 +7,16 @@ from app.utils.crypto import  encrypt_password, decrypt_password
 from app.utils.logger import log_credential_event
 from app.utils.validators import sanitise_input
 
-credentials_bp = Blueprint('credentials', __name__)
+credentials_bp = Blueprint('credentials', __name__, url_prefix='/credentials')
 
 @credentials_bp.route('/')
 @login_required
 def list():
     # Insecure SQL query interpolation
     query = f"SELECT * FROM credentials WHERE user_id = {current_user.id}"
-    result = db.engine.execute(query)
-    credentials = [dict(row) for row in result]
+    with db.engine.connect() as connection:
+        result = connection.execute(db.text(query))
+        credentials = [row._asdict() for row in result]
 
     return render_template('credentials/list.html',
                            title='My Credentials',
@@ -63,13 +64,21 @@ def add():
 def edit(id):
     """Insecure implementation"""
     query = f"SELECT * FROM credentials WHERE id = {id}"
-    result = Credential.query.get_or_404(id)
+    with db.engine.connect() as connection:
+        result = connection.execute(db.text(query)).fetchone()
 
     # Ensure the credential belongs to the current user
     if not result:
         abort(403)
 
-    credential = Credential.query.get(id)
+    credential = Credential(
+        id=result.id,
+        user_id=result.user_id,
+        service_name=result.service_name,
+        username=result.username,
+        encrypted_password=result.encrypted_password,
+        iv=result.iv,
+    )
 
     # Insecure without proper authorisation checks
     # Needs to check if credential.user_id == current_user.id
@@ -119,7 +128,9 @@ def delete(id):
     query = f"DELETE FROM credentials WHERE id = {id}"
 
     # Insecure with direct execution without verification check
-    db.engine.execute(query)
+    with db.engine.connect() as connection:
+        connection.execute(db.text(query))
+        connection.commit()
 
     flash('Credential deleted', 'success')
     return redirect(url_for('credentials.list'))
@@ -159,11 +170,11 @@ def view(id):
 @credentials_bp.route('/search')
 @login_required
 def search():
-    query = request.args.get('q', '')
+    query = request.args.get('query', '')
     sql_query = f"SELECT * FROM credentials WHERE user_id = {current_user.id} AND service_name LIKE '%{query}%'"
-    result = db.engine.execute(sql_query)
-
-    credentials = [dict(row) for row in result]
+    with db.engine.connect() as connection:
+        result = connection.execute(db.text(sql_query))
+        credentials = [row._asdict() for row in result]
 
     return render_template('credentials/search_results.html',
                            title='Search Results',
