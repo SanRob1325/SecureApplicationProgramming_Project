@@ -154,3 +154,30 @@ def view(id):
                            title='View Credentials',
                            credential=credential,
                            password=decrypted_password)
+
+@credentials_bp.route('/search')
+@login_required
+def search():
+    query = request.args.get('query', '')
+
+    # Using a parameterised query
+    sql_query = "SELECT * FROM credentials WHERE user_id = :user_id AND service_name LIKE :search_term"
+    params = {'user_id': current_user.id, 'search_term': f'%{query}%'}
+
+    with db.engine.connect() as connection:
+        result = connection.execute(db.text(sql_query), params)
+        credentials = [row._asdict() for row in result]
+
+
+    # Sanitise inputs for rendering
+    for credential in credentials:
+        if isinstance(credential.get('service_name'), str):
+            credential['service_name'] = sanitise_input(credential['service_name'])
+        if isinstance(credential.get('username'), str):
+            credential['username'] = sanitise_input(credential['username'])
+
+    return render_template('credentials/search_results.html',
+                           title='Search Results',
+                           query=sanitise_input(query),
+                           credentials=credentials
+                           )
