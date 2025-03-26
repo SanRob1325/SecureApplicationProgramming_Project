@@ -1,5 +1,7 @@
 import os
-from flask import Flask
+import traceback
+
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
@@ -60,6 +62,31 @@ def create_app(config_name=None):
     # Register security middleware
     from app.utils.middleware import register_middleware
     register_middleware(app)
+
+    @app.errorhandler(404)
+    def page_not_found(error):
+        return render_template('error.html', error_code=404, error_message="Page not found"), 404
+
+    @app.errorhandler(403)
+    def forbidden(error):
+        return render_template('error.html', error_code=403, error_message="Access forbidden"), 403
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        # Log the error details for debugging purposes
+        app.logger.error(f"Server Error: {str(error)}")
+        return render_template('error.html', error_code=500, error_message="Internal server error"), 500
+
+    # Catch all exception handler
+    @app.errorhandler(Exception)
+    def handle_exception(error):
+        # Log the exception for debugging
+        app.logger.error(f"Unhandled exception: {str(error)}")
+        import traceback
+        app.logger.error(traceback.format_exc())
+
+        # Return a generic error page to users
+        return render_template('error.html', error_code=500, error_message="An unexpected error occured"), 500
 
     @app.route('/health')
     def health_check():
