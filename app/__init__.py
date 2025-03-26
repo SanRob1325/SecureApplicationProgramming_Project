@@ -24,6 +24,13 @@ def create_app(config_name=None):
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
 
+    # Add session security configuration
+    app.config.update(
+        SESSION_COOKIE_SECURE=True,       # Only over HTTPS
+        SESSION_COOKIE_HTTPONLY=True,     # Not accessible through javascript
+        SESSION_COOKIE_SAMESITE='Lax',    # Mitigates CSRF attacks
+        PERMANENT_SESSION_LIFETIME=1800,  # 30 minute timeout
+    )
     if config_name is not None:
         app.config.from_object(config_name)
 
@@ -49,6 +56,10 @@ def create_app(config_name=None):
 
     with app.app_context():
         db.create_all()
+
+    # Register security middleware
+    from app.utils.middleware import register_middleware
+    register_middleware(app)
 
     @app.route('/health')
     def health_check():

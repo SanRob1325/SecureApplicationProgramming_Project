@@ -13,12 +13,28 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime, nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
-
     credentials = db.relationship('Credential', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     logs = db.relationship('Log', backref='user', lazy='dynamic')
 
+    auth_token = db.Column(db.String(64),nullable=True)
+    auth_token_expiry = db.Column(db.DateTime, nullable=True)
     def __repr__(self):
         return '<User {self.username}>'
+
+    def get_auth_token(self):
+        """Generate a secure token for remember me functionality"""
+        import secrets
+        from datetime import datetime,timedelta
+
+        # Generate token if it doesn't exist or has expired
+        if not self.auth_token or \
+            self.auth_token_expiry or \
+            self.auth_token_expiry < datetime.utcnow():
+
+            self.auth_token = secrets.token_hex(32)
+            self.auth_token_expiry = datetime.utcnow() + timedelta(days=30)
+            db.session.add(self)
+        return self.auth_token
 
 class Credential(db.Model):
     __tablename__ = 'credentials'

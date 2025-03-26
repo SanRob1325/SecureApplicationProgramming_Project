@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import User
@@ -22,11 +22,27 @@ def login():
             user.last_login = datetime.utcnow()
             db.session.commit()
 
+            # Regenerate session to prevent session fixation
+            if 'csrf_token' in session:
+                csrf_token = session['csrf_token']
+                session.clear()
+                session['csrf_token'] = csrf_token
+            else:
+                session.clear()
+
             # Log successful login
             log_auth_event(True, user.username, user.id)
 
             # Login user
             login_user(user, remember=form.remember_me.data)
+
+            # Set session as permanent with timeout that's defined in the app config
+            session.permanent = True
+
+            # Store IP and user agent for consistency checks
+            session['ip_address'] = request.remote_addr
+            session['user_agent'] = request.user_agent.string
+
             next_page = request.args.get('next')
             if not next_page or next_page.startswith('/'):
                 next_page = url_for('credentials.list')
@@ -43,6 +59,11 @@ def logout():
     if current_user.is_authenticated:
         log_auth_event(True, current_user.username, current_user.id)
     logout_user()
+
+    # Clear the session
+    session.clear()
+
+    flash('You have been logged out.', 'info')
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
@@ -71,6 +92,23 @@ def register():
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Register', form=form)
 
+@auth_bp.route('/terminate-sessions', methods=['POST'])
+@login_required
+def terminate_all_sessions():
+    user_id = current_user.id
+    username = current_user.username
+
+    # Log the action
+    log_auth_event(True, username, user_id, "session_termination")
+
+    # Logout user
+    logout_user()
+
+    # Clear the session
+    session.clear()
+    flash('All your sessions have been terminated.', 'success')
+    return redirect(url_for('auth.login'))
+
 @auth_bp.route('/change_password', methods=['GET', 'POST'])
 @login_required
 def change_password():
@@ -85,6 +123,14 @@ def change_password():
             current_user.password_hash = password_hash
             current_user.salt = salt
             db.session.commit()
+
+            # Regenerate sessions after password change
+            if 'csrf_token' in session:
+                csrf_token = session['csrf_token']
+                session.clear()
+                session['csrf_token'] = csrf_token
+                session['ip_address'] = request.remote_addr
+                session['user_agent'] = request.user_agent.string
 
             # Log password change
             log_auth_event(True, current_user.username, current_user.id)
