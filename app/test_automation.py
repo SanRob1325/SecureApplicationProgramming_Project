@@ -1,16 +1,15 @@
 import pytest
 import time
-
-from IPython.testing.plugin.test_refs import doctest_run
-from click import password_option
-from django.contrib.messages import success
+from app import create_app
+from app.models import User, db
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+
+from app.routes.admin import users
+
 
 class TestSecurePass:
     @pytest.fixture(autouse=True)
@@ -1146,6 +1145,38 @@ class TestSecurePass:
         # Assert no vulnerabilities found
         assert not vulnerability_found, "Sensistive data exposure vulnerability detected"
 
+    def setup_admin_user(self):
+        """Set up a dedicated admin user for testing"""
+        # Create a unique admin username
+        admin_username = f"admin_tester_{int(time.time())}"
+        admin_password = "Admin@Password123!"
+
+        driver = self.driver
+        # Register admin user
+        # Registration
+        driver.get(self.base_url + "/auth/register")
+        driver.find_element(By.NAME, "username").send_keys(admin_username)
+        driver.find_element(By.NAME, "password").send_keys(admin_password)
+        driver.find_element(By.NAME, "password2").send_keys(admin_password)
+        driver.find_element(By.NAME, "submit").click()
+        time.sleep(2)
+
+
+        # Create app context to access database
+        app = create_app()
+        with app.app_context():
+            # Find user that has been created
+            user = User.query.filter_by(username=admin_username).first()
+            if user:
+                # Promote to admin
+                user.is_admin = True
+                db.session.commit()
+                print(f"User {admin_username} promoted to admin for testing")
+                return admin_username, admin_password
+            else:
+                print("Failed to find user to promote to admin")
+                return None, None
+
     def test_session_timeout(self):
         """Test the user session timeout expires after timeout period"""
         driver = self.driver
@@ -1189,12 +1220,243 @@ class TestSecurePass:
         """Test admin ability to view user list"""
         driver = self.driver
 
-        admin_username = f"admin_test_{int(time.time())}"
-        admin_password = "Admin@Password123!"
+        # Create and get admin credentials
+        admin_username, admin_password = self.setup_admin_user()
+        assert admin_username is not None, "Failed to create admin user"
 
-        # Registration
-        driver.get(self.base_url + "/auth/register")
+        # Login as admin
+        driver.get(self.base_url + "/auth/login")
         driver.find_element(By.NAME, "username").send_keys(admin_username)
         driver.find_element(By.NAME, "password").send_keys(admin_password)
-        driver.find_element(By.NAME, "password2").send_keys(admin_password)
         driver.find_element(By.NAME, "submit").click()
+        time.sleep(2)
+
+        # Access admin user list
+        driver.get(self.base_url + "/admin/users")
+        time.sleep(2)
+
+        # Take screenshot of admin user list
+        driver.save_screenshot("admin_user_list.png")
+
+        # Verify admin page is accessible
+        assert "User Management" in driver.page_source, "Admin user list not accessible"
+
+        # Check for user entries in the list
+        user_table = driver.find_element(By.TAG_NAME, "table")
+        rows = user_table.find_elements(By.TAG_NAME, "tr")
+        assert len(rows) > 1, "No users found in admin user list"
+
+    def test_admin_view_logs(self):
+        """Test admin ability to view system logs"""
+        driver = self.driver
+
+        # Create and get admin credentials
+        admin_username, admin_password = self.setup_admin_user()
+        assert admin_username is not None, "Failed to create admin user"
+
+        # Login as admin
+        driver.get(self.base_url + "/auth/login")
+        driver.find_element(By.NAME, "username").send_keys(admin_username)
+        driver.find_element(By.NAME, "password").send_keys(admin_password)
+        driver.find_element(By.NAME, "submit").click()
+        time.sleep(2)
+
+        # Access admin logs list
+        driver.get(self.base_url + "/admin/logs")
+        time.sleep(2)
+
+        # Take screenshot of admin logs
+        driver.save_screenshot("admin_logs.png")
+
+        # Verify logs page is accessible
+        assert "System Logs" in driver.page_source, "Admin logs not accessible"
+
+        # Check for log entries
+        try:
+            log_table = driver.find_element(By.TAG_NAME, "table")
+            # Event if there are no logs, the table headers need exist
+            assert log_table, "Log table not found"
+        except NoSuchElementException:
+            assert False, "Log table not found on admin logs page"
+
+    def test_admin_promote_user(self):
+        """Test admin ability to promote user to admin"""
+        driver = self.driver
+
+        # Create and get admin credentials
+        admin_username, admin_password = self.setup_admin_user()
+        assert admin_username is not None, "Failed to create admin user"
+
+        # Create a regular user to be promoted
+        test_username = f"promote_test_{int(time.time())}"
+        test_password = "Test@Password123!"
+
+        # Register the test user
+        driver.get(self.base_url + "/auth/register")
+        driver.find_element(By.NAME, "username").send_keys(test_username)
+        driver.find_element(By.NAME, "password").send_keys(test_password)
+        driver.find_element(By.NAME, "password2").send_keys(test_password)
+        driver.find_element(By.NAME, "submit").click()
+        time.sleep(2)
+
+        # Login as admin
+        driver.get(self.base_url + "/auth/login")
+        driver.find_element(By.NAME, "username").send_keys(admin_username)
+        driver.find_element(By.NAME, "password").send_keys(admin_password)
+        driver.find_element(By.NAME, "submit").click()
+        time.sleep(2)
+
+        # Access admin user list
+        driver.get(self.base_url + "/admin/users")
+        time.sleep(2)
+
+        # Find newly created user
+        try:
+            user_row = driver.find_element(By.XPATH, f"//td[contains(text(), '{test_username}')]/ancestor::tr")
+            # Take screenshot before promotion
+            driver.save_screenshot("before_promotion.png")
+
+            # Find and click the promote button
+            promote_button = user_row.find_element(By.XPATH, ".//button[contains(text(), 'Make Admin')]")
+            driver.execute_script("arguments[0].scrollIntoView(true);", promote_button)
+            time.sleep(2)
+            promote_button.click()
+            time.sleep(2)
+
+            # Take screenshot after promotion
+            driver.save_screenshot("after_promotion.png")
+
+            # Verify the user has been promoted
+            driver.get(self.base_url + "/admin/users")
+            time.sleep(2)
+
+            # Find the user again
+            user_row = driver.find_element(By.XPATH, f"//td[contains(text(), '{test_username}')]/ancestor::tr")
+
+            # Check if the user row has admin badge
+            admin_badges = user_row.find_elements(By.XPATH, ".//span[contains(@class, 'badge') and contains(text(), 'Admin')]")
+            assert len(admin_badges) > 0, "User was not promoted to admin"
+        except NoSuchElementException as e:
+            assert False, f"Error finding elements for promotion: {e}"
+
+    def test_admin_view_user_logs(self):
+        """Test admin ability to view user logs"""
+        driver = self.driver
+
+        # Create and get admin credentials
+        admin_username, admin_password = self.setup_admin_user()
+        assert admin_username is not None, "Failed to create admin user"
+
+        # Create a regular user to view logs
+        test_username = f"log_test_{int(time.time())}"
+        test_password = "Test@Password123!"
+
+        # Register the test user
+        driver.get(self.base_url + "/auth/register")
+        driver.find_element(By.NAME, "username").send_keys(test_username)
+        driver.find_element(By.NAME, "password").send_keys(test_password)
+        driver.find_element(By.NAME, "password2").send_keys(test_password)
+        driver.find_element(By.NAME, "submit").click()
+        time.sleep(2)
+
+        # Login as user to generate some logs
+        driver.get(self.base_url + "/auth/login")
+        driver.find_element(By.NAME, "username").send_keys(test_username)
+        driver.find_element(By.NAME, "password").send_keys(test_password)
+        driver.find_element(By.NAME, "submit").click()
+        time.sleep(2)
+
+        # Navigate around to generate logs
+        driver.get(self.base_url + "/add")
+        time.sleep(1)
+        driver.get(self.base_url + "/")
+        time.sleep(1)
+        driver.get(self.base_url + "/auth/logout")
+        time.sleep(1)
+
+        # Now login as admin
+        driver.get(self.base_url + "/auth/login")
+        driver.find_element(By.NAME, "username").send_keys(admin_username)
+        driver.find_element(By.NAME, "password").send_keys(admin_password)
+        driver.find_element(By.NAME, "submit").click()
+        time.sleep(2)
+
+        # Access admin user list
+        driver.get(self.base_url + "/admin/users")
+        time.sleep(2)
+
+        try:
+            # Find the test user
+            user_row = driver.find_element(By.XPATH, f"//td[contains(text(), '{test_username}')]/ancestor::tr")
+            view_logs_button = user_row.find_element(By.XPATH, ".//a[contains(text(), 'View Logs')]")
+
+            # Take screenshot before viewing logs
+            driver.save_screenshot("before_user_logs.png")
+            driver.execute_script("arguments[0].scrollIntoView(true);", view_logs_button)
+            time.sleep(2)
+            view_logs_button.click()
+            time.sleep(2)
+
+            # Take a screenshot of user logs
+            driver.save_screenshot("user_logs.png")
+
+            # Verify that admin is on user logs page
+            assert f"Logs for {test_username}" in driver.page_source, "User specific logs not accessible"
+
+        except NoSuchElementException as e:
+            assert False, f"Error finding user logs: {e}"
+
+    def test_regular_user_admin_access(self):
+        """Test that regular users cannot access admin features"""
+        driver = self.driver
+
+        # Create and admin user first
+        admin_username, admin_password = self.setup_admin_user()
+        assert admin_username is not None, "Failed to create admin user"
+
+        # Create and login as regular user
+        test_username = f"regular_test_{int(time.time())}"
+        test_password = "Test@Password123!"
+
+        # Register the test user
+        driver.get(self.base_url + "/auth/register")
+        driver.find_element(By.NAME, "username").send_keys(test_username)
+        driver.find_element(By.NAME, "password").send_keys(test_password)
+        driver.find_element(By.NAME, "password2").send_keys(test_password)
+        driver.find_element(By.NAME, "submit").click()
+        time.sleep(2)
+
+        # Login as user to generate some logs
+        driver.get(self.base_url + "/auth/login")
+        driver.find_element(By.NAME, "username").send_keys(test_username)
+        driver.find_element(By.NAME, "password").send_keys(test_password)
+        driver.find_element(By.NAME, "submit").click()
+        time.sleep(2)
+
+        # Try to access admin page directly
+        admin_pages = [
+            "/admin/",
+            "/admin/user",
+            "/admin/logs",
+            "/admin/security"
+
+        ]
+
+        for page in admin_pages:
+            # Try to access the admin page
+            driver.get(self.base_url + page)
+            time.sleep(1)
+
+            # Take screenshot
+            driver.save_screenshot(f"admin_access_attempt_{page.replace('/', '_')}.png")
+
+            # Verify access is denied
+            access_denied = (
+                "Error 402" in driver.page_source or
+                "Access forbidden" in driver.page_source or
+                "/auth/login" in driver.page_source or
+                not "Admin Dashboard" in driver.page_source
+            )
+
+            assert access_denied, f"Regvlar user can access admin page {page}"
+            print(f"Regular users cannot access {page}")
