@@ -96,7 +96,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+<script nonce="{{ nonce }}">
     document.addEventListener('DOMContentLoaded', function(){
         // length slider and input sychronisation
         const lengthSlider = document.getElementById('lengthSlider')
