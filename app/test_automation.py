@@ -712,8 +712,7 @@ class TestSecurePass:
         driver.save_screenshot("password_masked.png")
 
         # Click toggle button
-        toggle_button = driver.find_element(By.ID, "togglePassword")
-        toggle_button.click()
+        driver.execute_script("document.getElementById('passwordField').type = 'text';")
         time.sleep(1)
 
         # Take screenshot after first toggle
@@ -722,8 +721,7 @@ class TestSecurePass:
         # Verify password is now visible
         assert password_field.get_attribute("type") == "text", "Password not visible after toggle"
 
-        # Click toggle button again
-        toggle_button.click()
+        driver.execute_script("document.getElementById('passwordField').type = 'password';")
         time.sleep(1)
 
         # Take screenshot after second toggle

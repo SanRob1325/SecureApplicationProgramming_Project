@@ -60,7 +60,15 @@ def add_security_headers(response):
     """Add security headers to HTTPS responses"""
 
     # Content Security Policy
-    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'; font-src 'self' https://cdnjs.cloudflare.com data:; img-src 'self' data:"
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' https://cdn.jsdelivr.net; "
+        "style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+        "font-src 'self' https://cdnjs.cloudflare.com data:; "
+        "img-src 'self' data:"
+        "frame-ancestors 'none'; "
+        "form-action 'self'"
+    )
     # Prevent MIME sniffing
     response.headers['X-Content-Type-Options'] = 'nosniff'
     # Clickjacking protection

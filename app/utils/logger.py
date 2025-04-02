@@ -13,7 +13,8 @@ def setup_logging(app):
     file_handler = RotatingFileHandler(
         'logs/securepass.log',
         maxBytes=10240,
-        backupCount=10
+        backupCount=10,
+        delay=True
     )
     file_handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
