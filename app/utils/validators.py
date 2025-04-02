@@ -2,7 +2,6 @@ import re
 
 from markupsafe import escape
 
-
 def sanitise_input(input_str):
     """Sanitise the input string to prevent XSS attacks"""
     if input_str is None:
@@ -11,6 +10,13 @@ def sanitise_input(input_str):
     sanitised = escape(input_str)
 
     return sanitised
+
+def validate_search_input(input_str):
+    """Validate search input to prevent potential injections"""
+    if not input_str:
+        return False
+
+    return re.match(r'^[a-zA-Z0-9\s]{1,50}$', input_str) is not None
 
 def validate_password_strength(password):
     """Validated strength"""
