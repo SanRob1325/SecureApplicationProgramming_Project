@@ -1,0 +1,23 @@
+# Python specific ignores
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env
+
+# Database
+*.db
+instance/
+
+# Logs
+logs/
+*.log
+
+# IDE specific
+.vscode/
+.idea/
+
+# Sensitive configuration
+config.py
