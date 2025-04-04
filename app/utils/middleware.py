@@ -1,4 +1,5 @@
-from flask import session, request, redirect, url_for, flash
+import secrets
+from flask import session, request, redirect, url_for, flash, g
 from flask_login import current_user, logout_user
 from datetime import datetime, timedelta
 
@@ -58,14 +59,15 @@ def validate_session_integrity():
 
 def add_security_headers(response):
     """Add security headers to HTTPS responses"""
-
+    # Get the nonce from the request context
+    nonce = getattr(g, 'nonce', '')
     # Content Security Policy
     response.headers['Content-Security-Policy'] = (
         "default-src 'self'; "
-        "script-src 'self' https://cdn.jsdelivr.net; "
-        "style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+        f"script-src 'self' https://cdn.jsdelivr.net 'nonce-{nonce}'; "
+        f"style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'nonce-{nonce}'; "
         "font-src 'self' https://cdnjs.cloudflare.com data:; "
-        "img-src 'self' data:"
+        "img-src 'self' data:; "
         "frame-ancestors 'none'; "
         "form-action 'self'"
     )
@@ -82,13 +84,19 @@ def add_security_headers(response):
 
     return response
 
+# Reference about nonce usage: https://www.okta.com/identity-101/nonce/
+def generate_nonce():
+    """Generate a unique nonce for CSP"""
+    return secrets.token_hex(16)
+
 def register_middleware(app):
     """Register all middlewares with Flask application"""
 
     @app.before_request
     def before_request_middleware():
         """Run all before request middleware"""
-
+        # Generate a nonce for this request
+        g.nonce = generate_nonce()
         # Check session timeout
         result = session_timeout_check()
         if result:
@@ -103,3 +111,8 @@ def register_middleware(app):
     def after_request_middleware(response):
         """Run all after request middleware"""
         return add_security_headers(response)
+
+    @app.context_processor
+    def inject_nonce():
+        """Inject nonce into templates"""
+        return {'nonce': getattr(g, 'nonce', '')}

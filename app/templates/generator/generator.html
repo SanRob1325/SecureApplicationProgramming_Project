@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 
+{%  block styles %}
+<style nonce="{{ nonce }}">
+    .progress-custom-height{
+        height: 20px;
+    }
+    .password-strength-section {
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
@@ -51,27 +62,25 @@
                         {{ form.submit(class="btn btn-primary") }}
                     </div>
                     {%  if password %}
-
                         <div class="card mt-4">
-                        <div class="card-header">
-                        <h5 class="mb-0">Generated Password</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" value="{{ password }}" id="generatedPasswordField" readonly>
-                            <button class="btn btn-outline-secondary" type="button" id="copyPassword" data-bs-toggle="tooltip" title="Copy to clipboard">
-                                <i class="fas fa-copy"></i>
-                            </button>
+                            <div class="card-header">
+                                <h5 class="mb-0">Generated Password</h5>
                         </div>
-                        <div class="password-strength mt-3">
-                            <div class="progress mb-2">
-                                <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemax="100"></div>
+                        <div class="card-body">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" value="{{ password }}" id="generatedPasswordField" readonly>
+                                <button class="btn btn-outline-secondary" type="button" id="copyPassword" data-bs-toggle="tooltip" title="Copy to clipboard">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength-section">
+                                <div class="progress mb-2 progress-custom-height">
+                                <div id="strengthBar" class="progress-bar w-0" role="progressbar" aria-valuenow="0" aria-valuemax="100"></div>
                             </div>
                             <p id="strengthText" class="text-center">Password strength: Calculation</p>
                         </div>
                     </div>
                     </div>
-
                     {% endif %}
                 </form>
             </div>
@@ -123,17 +132,17 @@
         }
 
         // Character type checkboxes
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]')
-        let lastChecked = null
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        let lastChecked = null;
 
         checkboxes.forEach(checkbox =>{
             checkbox.addEventListener('change', function(){
                 // If this is unchecked and is the last one checked
                 if (!this.checked && !Array.from(checkboxes).some(cb => cb !== this && cb.checked)){
-                    this.checked = true
+                    this.checked = true;
                     alert('At least one character should be selected')
                 }else if(this.checked){
-                    lastChecked = this
+                    lastChecked = this;
                 }
             })
         })
@@ -148,38 +157,41 @@
 
                 // Show copied tooltip
                 const tooltip = bootstrap.Tooltip.getInstance(this)
-
-                // Save original title
-                const originalTitle = this.getAttribute('data-bs-original-title')
-
-                // Set new title
-                tooltip.hide()
-                this.setAttribute('data-bs-original-title', 'Copied')
-                tooltip.show()
-
-                // Restore original title after delay
-                setTimeout(() => {
+                if (tooltip) {
+                    // Save original title
+                    const originalTitle = this.getAttribute('data-bs-original-title')
+                    // Set new title
                     tooltip.hide()
-                    this.setAttribute('data-bs-original-title', originalTitle)
-                }, 1000)
-            })
+                    this.setAttribute('data-bs-original-title', 'Copied')
+                    tooltip.show()
+                    // Restore original title after delay
+                    setTimeout(() => {
+                        tooltip.hide()
+                        this.setAttribute('data-bs-original-title', originalTitle)
+                    }, 1000);
+                }
+            });
 
             // Initialise tooltips
             new bootstrap.Tooltip(copyPassword);
+            // Calculate password strength when DOM loads
+            setTimeout(function (){
+                // Calculate password strength when DOM loads
+                calculatePasswordStrength(generatedPasswordField.value)
+            }, 100);
         }
-        // Password strength calculator
-        const strengthBar = document.getElementById('strengthBar')
-        const strengthText = document.getElementById('strengthText')
-
-        if(strengthBar && strengthText && generatedPasswordField){
-            calculatePasswordStrength(generatedPasswordField.value)
-        }
-
 
         function calculatePasswordStrength(password){
+            // Password strength calculator
+            const strengthBar = document.getElementById('strengthBar')
+            const strengthText = document.getElementById('strengthText')
+
+             if(!strengthBar || !strengthText || !password){
+                 return // Exit if elements are not found or is empty
+            }
+
             let strength = 0
             let feedback = ''
-
 
             if(password.length >= 12){
                 strength += 25
@@ -217,21 +229,30 @@
             // Cap at 100%
             strength = Math.min(strength, 100)
 
-            // Update UI
-            strengthBar.style.width = strength + '%'
+            for(let i = 0; i <= 100; i += 5){
+                strengthBar.classList.remove('w-' + i);
+            }
+            // Round to nearest 5 to match Bootstraps width classes
+            const roundedStrength = Math.round(strength / 5) * 5;
+            strengthBar.classList.add('w-' + roundedStrength);
+
+            // Update aria value for accesiblity
+            strengthBar.setAttribute('aria-valuenow', strength)
+
+            strengthBar.classList.remove('bg-danger', 'bg-warning', 'bg-success');
+            console.log("Calculated strength:", strength);
 
             // Set color based on strength
             if(strength < 40){
-                strengthBar.className = 'progress-bar bg-danger'
+                strengthBar.classList.add('bg-danger')
                 strengthText.innerHTML = 'Password Strength: <strong>Weak</strong><br>' + feedback
             } else if (strength < 70){
-                strengthBar.className = 'progress-bar bg-warning'
+                strengthBar.classList.add('bg-warning')
                 strengthText.innerHTML = 'Password Strength: <strong>Moderate</strong><br>' + feedback
             } else{
-                strengthBar.className = 'progress-bar bg-success'
+                strengthBar.classList.add('bg-success')
                 strengthText.innerHTML = 'Password Strength: <strong>Strong</strong><br>' + feedback
             }
-
         }
     })
 </script>
