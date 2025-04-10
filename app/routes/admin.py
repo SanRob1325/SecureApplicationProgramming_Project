@@ -5,25 +5,27 @@ from app.models import User, Log
 from app.utils.logger import log_admin_event
 from functools import wraps
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
-
+# Inspiration for admin creation:https://kamelodee.medium.com/setting-up-user-management-in-flask-with-flask-admin-and-flask-login-4406c84fc0a6
 # Decorator to restrict access to admin users
 def admin_required(view):
     @login_required
     @wraps(view)
     def wrapped_view(**kwargs):
         if not current_user.is_admin:
-            abort(403)
+            abort(403) # returns 403 if access is denied as admin
         return view(**kwargs)
     return wrapped_view
 
 @admin_bp.route('/')
 @admin_required
 def index():
+    # Renders the admin dashboard
     return render_template('admin/index.html', title='Admin Dashboard')
 
 @admin_bp.route('/logs')
 @admin_required
 def logs():
+    # View and paginate system logs
     page = request.args.get('page', 1, type=int)
     per_page = 50
 
@@ -68,6 +70,7 @@ def promote_user(user_id):
 @admin_bp.route('/user_logs/<int:user_id>')
 @admin_required
 def user_logs(user_id):
+    # Viewing specific user logs
     user = User.query.get_or_404(user_id)
     page = request.args.get('page', 1, type=int)
     per_page = 50
@@ -83,6 +86,7 @@ def user_logs(user_id):
 @admin_required
 
 def security_dashboard():
+    # View the security dashboard with login attempts and event counts
     # Get recent failed login attempts
     failed_logins = Log.query.filter_by(event_type='login_failure').order_by(Log.timestamp.desc()).limit(10).all()
 

@@ -6,6 +6,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 
+# Reference to password hashing implementation inspirations:https://iamholumeedey007.medium.com/python-hashing-and-salting-2987ec73fa7c
 def hash_password(password):
     """Hashing a password using bycrpt with random salting"""
     # generate a random salt
@@ -28,7 +29,7 @@ def generate_encryption_key():
     # Generate a secure random 32-by key
     key = os.urandom(32)
     return base64.b64encode(key).decode('utf-8')
-
+# Referencing encryption: https://medium.com/@dheeraj.mickey/how-to-encrypt-and-decrypt-files-in-python-using-aes-a-step-by-step-guide-d0eb6f525e4e
 def derive_key(encryption_key, salt):
     """Deriving encryption key from a password and salt using PBKDF2"""
     if isinstance(encryption_key, str):

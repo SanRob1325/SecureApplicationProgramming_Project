@@ -1,7 +1,7 @@
 import re
 
 from markupsafe import escape
-
+# Reference to the input sanitisation implementation: https://how.dev/answers/how-to-sanitize-user-input-in-python
 def sanitise_input(input_str):
     """Sanitise the input string to prevent XSS attacks"""
     if input_str is None:
@@ -10,7 +10,7 @@ def sanitise_input(input_str):
     sanitised = escape(input_str)
 
     return sanitised
-
+# Reference to implemented validation: https://medium.com/@shuklamansi800/a-step-by-step-guide-to-data-validation-in-python-83d87871f04
 def validate_search_input(input_str):
     """Validate search input to prevent potential injections"""
     if not input_str:

@@ -10,12 +10,13 @@ from app.forms import CredentialForm
 from app.utils.crypto import  encrypt_password, decrypt_password
 from app.utils.logger import log_credential_event
 from app.utils.validators import sanitise_input
-
+# Reference to blueprint rendering usage:https://www.digitalocean.com/community/tutorials/how-to-add-authentication-to-your-app-with-flask-login
 credentials_bp = Blueprint('credentials', __name__)
 
 @credentials_bp.route('/')
 @login_required
 def list():
+    # List of all credentials for the logged in user
     credentials = Credential.query.filter_by(user_id=current_user.id).all()
     return render_template('credentials/list.html',
                            title='My Credentials',
@@ -24,17 +25,18 @@ def list():
 @credentials_bp.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
+    # Add a new credential to the database
     if not current_user.encryption_key:
         flash('Your account needs to be updated.Please contact Admin','danger')
         return redirect(url_for('credentials.list'))
 
     form = CredentialForm()
     if form.validate_on_submit():
-        # Sanitise inputs
+        # Sanitise inputs and validate them
         service_name = sanitise_input(form.service_name.data)
         username = sanitise_input(form.username.data)
 
-        # Encrypt the password
+        # Encrypt the password using users encryption key
         encrypted_password, iv = encrypt_password(form.password.data, current_user.encryption_key)
 
         # Create new credential

@@ -7,19 +7,25 @@ from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from app.utils.logger import setup_logging
 
-
-db = SQLAlchemy()
-login_manager = LoginManager()
-csrf = CSRFProtect() #cross site request forgery
+# Reference to SQLite creation using SQLAlchemy: https://devcamp.com/trails/python-api-development-with-flask/campsites/hello-flask/guides/creating-sqlite-database-flask-sqlalchemy
+# Reference to SQLAlchemy implementation of SQLite: https://flask-sqlalchemy.readthedocs.io/en/stable/quickstart/
+db = SQLAlchemy() # SQLAlchemy for database management
+login_manager = LoginManager() # Flask login for user session management
+csrf = CSRFProtect() #cross site request forgery for secure forms
 
 def create_app(config_name=None):
+
+    """
+    Is a Factory function to create and configure the Falsk application,
+    It sets up various configuration, extensions, blueprints,logging and error handlers
+    """
     app = Flask(__name__, instance_relative_config=True)
 
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
-
+    # Default configurations
     app.config.from_mapping(
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'securepass.db'),
@@ -35,7 +41,7 @@ def create_app(config_name=None):
     )
     if config_name is not None:
         app.config.from_object(config_name)
-
+    # Initialise extensions
     db.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
@@ -62,7 +68,7 @@ def create_app(config_name=None):
     # Register security middleware
     from app.utils.middleware import register_middleware
     register_middleware(app)
-
+    # Error handling routes for 404,403,and 500
     @app.errorhandler(404)
     def page_not_found(error):
         return render_template('error.html', error_code=404, error_message="Page not found"), 404
@@ -77,7 +83,7 @@ def create_app(config_name=None):
         app.logger.error(f"Server Error: {str(error)}")
         return render_template('error.html', error_code=500, error_message="Internal server error"), 500
 
-    # Catch all exception handler
+    # Catch all exception handlers
     @app.errorhandler(Exception)
     def handle_exception(error):
         # Log the exception for debugging

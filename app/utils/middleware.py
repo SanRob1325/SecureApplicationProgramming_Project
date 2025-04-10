@@ -2,7 +2,8 @@ import secrets
 from flask import session, request, redirect, url_for, flash, g
 from flask_login import current_user, logout_user
 from datetime import datetime, timedelta
-
+# Inspiration for session management: https://kamelodee.medium.com/setting-up-user-management-in-flask-with-flask-admin-and-flask-login-4406c84fc0a6
+# Inspiration for middleware implemetation: https://docs.djangoproject.com/en/5.1/topics/http/middleware/#:~:text=A%20middleware%20is%20a%20callable,response%2C%20just%20like%20a%20view.&text=The%20get_response%20callable%20provided%20by,next%20middleware%20in%20the%20chain.
 def session_timeout_check():
     """Check for session timeout and update last activity timestamp."""
     if current_user.is_authenticated:
@@ -56,7 +57,9 @@ def validate_session_integrity():
                 session['ip_address'] = current_ip
 
     return None
-
+# Reference to security header management: https://www.peterspython.com/en/blog/flask-site-penetration-tests-security-headers-and-the-session-cookie?theme=lux
+# Reference to security principles such as CSRF token keys: https://escape.tech/blog/best-practices-protect-flask-applications/
+# Reference for security header management:https://qwiet.ai/appsec-resources/securing-your-flask-applications-essential-extensions-and-best-practices/#:~:text=These%20headers%20help%20protect%20against,security%20standards%20and%20best%20practices.
 def add_security_headers(response):
     """Add security headers to HTTPS responses"""
     # Get the nonce from the request context

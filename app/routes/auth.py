@@ -8,7 +8,7 @@ from app.utils.logger import log_auth_event
 from datetime import datetime
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
-
+# Blueprint for authentication routes
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -16,6 +16,7 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
+        # Validate user credentials
         user = User.query.filter_by(username=form.username.data).first()
         if user and verify_password(form.password.data, user.password_hash, user.salt):
             # Update last login time
@@ -56,6 +57,7 @@ def login():
 
 @auth_bp.route('/logout')
 def logout():
+    # logout the current user
     if current_user.is_authenticated:
         log_auth_event(True, current_user.username, current_user.id)
     logout_user()
@@ -68,13 +70,15 @@ def logout():
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
+    # User registration route
     if current_user.is_authenticated:
-        return redirect(url_for('credentials.list'))
+        return redirect(url_for('credentials.list')) # Redirects user to credentials if they are already logged in
 
     form = RegistrationForm()
     if form.validate_on_submit():
         password_hash, salt = hash_password(form.password.data)
         encryption_key = generate_encryption_key()
+        # Create a new User
         user = User(
             username=form.username.data,
             password_hash=password_hash,
@@ -95,6 +99,7 @@ def register():
 @auth_bp.route('/terminate-sessions', methods=['POST'])
 @login_required
 def terminate_all_sessions():
+    # Terminates the current session for the logged in user
     user_id = current_user.id
     username = current_user.username
 

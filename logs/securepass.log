@@ -1,2 +1,130 @@
-2025-04-04 22:40:32,349 INFO: SecurePass startup [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\utils\logger.py:27]
-2025-04-04 22:40:32,968 INFO: SecurePass startup [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\utils\logger.py:27]
+2025-04-06 14:27:06,133 INFO: SecurePass startup [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\utils\logger.py:27]
+2025-04-06 14:27:06,807 INFO: SecurePass startup [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\utils\logger.py:27]
+2025-04-06 14:27:12,233 ERROR: Unhandled exception: 400 Bad Request: The CSRF token is missing. [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:84]
+2025-04-06 14:27:12,234 ERROR: Traceback (most recent call last):
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 261, in protect
+    validate_csrf(self._get_csrf_token())
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 100, in validate_csrf
+    raise ValidationError("The CSRF token is missing.")
+wtforms.validators.ValidationError: The CSRF token is missing.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask\app.py", line 915, in full_dispatch_request
+    rv = self.preprocess_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask\app.py", line 1291, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 229, in csrf_protect
+    self.protect()
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 264, in protect
+    self._error_response(e.args[0])
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 307, in _error_response
+    raise CSRFError(reason)
+flask_wtf.csrf.CSRFError: 400 Bad Request: The CSRF token is missing.
+ [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:86]
+2025-04-06 14:27:12,241 ERROR: Unhandled exception: 400 Bad Request: The CSRF session token is missing. [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:84]
+2025-04-06 14:27:12,242 ERROR: Traceback (most recent call last):
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 261, in protect
+    validate_csrf(self._get_csrf_token())
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 103, in validate_csrf
+    raise ValidationError("The CSRF session token is missing.")
+wtforms.validators.ValidationError: The CSRF session token is missing.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask\app.py", line 915, in full_dispatch_request
+    rv = self.preprocess_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask\app.py", line 1291, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 229, in csrf_protect
+    self.protect()
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 264, in protect
+    self._error_response(e.args[0])
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 307, in _error_response
+    raise CSRFError(reason)
+flask_wtf.csrf.CSRFError: 400 Bad Request: The CSRF session token is missing.
+ [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:86]
+2025-04-06 14:27:12,246 ERROR: Unhandled exception: 400 Bad Request: The CSRF session token is missing. [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:84]
+2025-04-06 14:27:12,247 ERROR: Traceback (most recent call last):
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 261, in protect
+    validate_csrf(self._get_csrf_token())
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 103, in validate_csrf
+    raise ValidationError("The CSRF session token is missing.")
+wtforms.validators.ValidationError: The CSRF session token is missing.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask\app.py", line 915, in full_dispatch_request
+    rv = self.preprocess_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask\app.py", line 1291, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 229, in csrf_protect
+    self.protect()
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 264, in protect
+    self._error_response(e.args[0])
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 307, in _error_response
+    raise CSRFError(reason)
+flask_wtf.csrf.CSRFError: 400 Bad Request: The CSRF session token is missing.
+ [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:86]
+2025-04-06 14:29:00,741 INFO: SecurePass startup [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\utils\logger.py:27]
+2025-04-06 14:29:05,062 ERROR: Unhandled exception: 400 Bad Request: The CSRF token is missing. [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:84]
+2025-04-06 14:29:05,063 ERROR: Traceback (most recent call last):
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 261, in protect
+    validate_csrf(self._get_csrf_token())
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 100, in validate_csrf
+    raise ValidationError("The CSRF token is missing.")
+wtforms.validators.ValidationError: The CSRF token is missing.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask\app.py", line 915, in full_dispatch_request
+    rv = self.preprocess_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask\app.py", line 1291, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 229, in csrf_protect
+    self.protect()
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 264, in protect
+    self._error_response(e.args[0])
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 307, in _error_response
+    raise CSRFError(reason)
+flask_wtf.csrf.CSRFError: 400 Bad Request: The CSRF token is missing.
+ [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:86]
+2025-04-06 14:29:05,070 ERROR: Unhandled exception: 400 Bad Request: The CSRF session token is missing. [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:84]
+2025-04-06 14:29:05,071 ERROR: Traceback (most recent call last):
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 261, in protect
+    validate_csrf(self._get_csrf_token())
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 103, in validate_csrf
+    raise ValidationError("The CSRF session token is missing.")
+wtforms.validators.ValidationError: The CSRF session token is missing.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask\app.py", line 915, in full_dispatch_request
+    rv = self.preprocess_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask\app.py", line 1291, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 229, in csrf_protect
+    self.protect()
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 264, in protect
+    self._error_response(e.args[0])
+  File "C:\Users\seanr\miniconda3\Lib\site-packages\flask_wtf\csrf.py", line 307, in _error_response
+    raise CSRFError(reason)
+flask_wtf.csrf.CSRFError: 400 Bad Request: The CSRF session token is missing.
+ [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:86]
+2025-04-06 16:16:02,450 ERROR: Unhandled exception: 400 Bad Request: The CSRF token is missing. [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:84]
+2025-04-06 16:16:02,472 ERROR: Unhandled exception: 400 Bad Request: The CSRF session token is missing. [in C:\Users\seanr\Documents\NCI\Computing\Year 4\Secure Application Programming\Secure Application Project\app\__init__.py:84]

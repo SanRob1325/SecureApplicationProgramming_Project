@@ -2,6 +2,8 @@ from datetime import datetime
 from flask_login import UserMixin
 from app import db, login_manager
 
+# Reference to model migrations and SQL conversion of models https://medium.com/@shivamkhandelwal555/a-proper-way-of-declaring-models-in-flask-9ce0bb0e42c1
+# User table
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
@@ -36,6 +38,7 @@ class User(UserMixin, db.Model):
             db.session.add(self)
         return self.auth_token
 
+# Credential table
 class Credential(db.Model):
     __tablename__ = 'credentials'
 
@@ -51,7 +54,7 @@ class Credential(db.Model):
     def __repr__(self):
         return f'<Credential {self.service_name} for {self.user.username}>'
 
-
+# Log table
 class Log(db.Model):
     __tablename__ = 'logs'
     id = db.Column(db.Integer, primary_key=True)

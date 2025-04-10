@@ -3,7 +3,7 @@ import logging
 from logging.handlers import  RotatingFileHandler
 from flask import request, g
 from datetime import datetime
-
+# Reference for logging and monitoring implementation: https://signoz.io/guides/logging-in-python/
 def setup_logging(app):
     """Set up the logging framework for the application"""
     # Creating logs directory if it doesn't exist

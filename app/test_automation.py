@@ -10,7 +10,9 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 from app.routes.admin import users
 
-
+# Reference to Selenium testing:https://selenium-python.readthedocs.io/
+# Reference to test construction:https://www.browserstack.com/guide/python-selenium-to-run-web-automation-test
+# Reference to testing in the selenium library: https://medium.com/@moraneus/guide-to-using-python-selenium-873342d5fdad
 class TestSecurePass:
     @pytest.fixture(autouse=True)
     def setup(self):
